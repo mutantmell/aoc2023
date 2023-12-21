@@ -15,3 +15,21 @@ fn parse_line(line: String) -> std::result::Result<(u32, u32), &'static str> {
 	Err("Invalid line")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_line_givens() {
+	let cases = vec![
+	    ("1abc2", (1,2)),
+	    ("pqr3stu8vwx", (3,8)),
+	    ("a1b2c3d4e5f", (1,5)),
+	    ("treb7uchet", (7,7)),
+	];
+	for (s, expected) in cases {
+	    assert_eq!(parse_line(s.to_string()), Ok(expected));
+	}
+    }
+}
