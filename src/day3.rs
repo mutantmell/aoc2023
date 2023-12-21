@@ -25,10 +25,11 @@ fn parse_grid(grid: Vec<String>) -> Grid {
 
 	let mut num: i64 = 0;
 	let mut num_ix: i32 = i32::MAX;
+	let mut y_i32: i32 = -1;
 
 	for (y_ix, c) in grid_line.chars().enumerate() {
 	    let y = u32::try_from(y_ix).unwrap();
-	    let y_i32 = i32::try_from(y).unwrap();
+	    y_i32 = i32::try_from(y).unwrap();
 	    match c.to_digit(10) {
 		Some(d) => {
 		    num = (num * 10) + i64::from(d);
@@ -58,6 +59,13 @@ fn parse_grid(grid: Vec<String>) -> Grid {
 		}
 	    }
 	}
+	if num > 0 {
+	    numbers.push(Number {
+		label: num,
+		start: (x_i32, num_ix),
+		len: y_i32 - num_ix,
+	    });
+	};
     }
     Grid {
 	numbers: numbers,
@@ -65,10 +73,11 @@ fn parse_grid(grid: Vec<String>) -> Grid {
     }
 }
 
-pub fn solve_a(input: Vec<String>) -> Result<String, &'static str> {
+pub fn solve_3a(input: Vec<String>) -> Result<String, &'static str> {
     let grid = parse_grid(input);
     let mut sum: i64 = 0;
     for n in grid.numbers {
+	println!("{:?}", n);
 	if (0..(n.len)).any(|x| grid.symbols.contains_key(&(n.start.0, n.start.1+x))) {
 	    sum += n.label;
 	}
@@ -174,6 +183,6 @@ mod tests {
 
     #[test]
     fn solve_a_given() {
-	assert_eq!(solve_a(grid()), Ok("4361".to_string()));
+	assert_eq!(solve_3a(grid()), Ok("4361".to_string()));
     }
 }

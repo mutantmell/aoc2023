@@ -25,7 +25,7 @@ where A: AsRef<Path>, {
 fn main() {
     let mut args = env::args();
     args.next();  // Program name
-    let day = args.next().and_then(|a| a.parse::<i64>().ok()).unwrap_or(1);
+    let day = args.next().and_then(|a| a.parse::<i64>().ok()).unwrap_or(3);
     let sub_day = args.next().unwrap_or("a".to_string());
 
     let aoc: HashMap<i64, AoC> = [
@@ -38,7 +38,12 @@ fn main() {
 	    input: Box::new(PathBuf::from("./data/day2.txt")),
 	    a: day2::solve_2a,
 	    b: Some(day2::solve_2b),
-	})
+	}),
+	(3, AoC {
+	    input: Box::new(PathBuf::from("./data/day3.txt")),
+	    a: day3::solve_3a,
+	    b: None,
+	}),
     ].into();
 
     let problem = &aoc[&day];
