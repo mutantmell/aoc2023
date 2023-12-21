@@ -65,13 +65,23 @@ fn parse_grid(grid: Vec<String>) -> Grid {
     }
 }
 
+pub fn solve_a(input: Vec<String>) -> Result<String, &'static str> {
+    let grid = parse_grid(input);
+    let mut sum: i64 = 0;
+    for n in grid.numbers {
+	if (0..(n.len)).any(|x| grid.symbols.contains_key(&(n.start.0, n.start.1+x))) {
+	    sum += n.label;
+	}
+    }
+    Ok(sum.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn parse_grid_givens() {
-	let grid = vec![
+    fn grid() -> Vec<String> {
+	vec![
 	    "467..114..",
 	    "...*......",
 	    "..35..633.",
@@ -82,9 +92,12 @@ mod tests {
 	    "......755.",
 	    "...$.*....",
 	    ".664.598..",
-	].into_iter().map(|x| x.to_string()).collect();
-
-	assert_eq!(parse_grid(grid), Grid {
+	].into_iter().map(|x| x.to_string()).collect()
+    }
+    
+    #[test]
+    fn parse_grid_givens() {
+	assert_eq!(parse_grid(grid()), Grid {
 	    numbers: vec![
 		Number { label: 467, start: (0, 0), len: 3 },
 		Number { label: 114, start: (0, 5), len: 3 },
@@ -157,5 +170,10 @@ mod tests {
 		((9,6), vec!['*']),
 	    ].into(),
 	});
+    }
+
+    #[test]
+    fn solve_a_given() {
+	assert_eq!(solve_a(grid()), Ok("4361".to_string()));
     }
 }
