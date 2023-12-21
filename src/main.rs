@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 
 mod day1;
 mod day2;
+mod day3;
 
 type Solve = fn(Vec<String>) -> Result<String, &'static str>;
 

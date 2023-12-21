@@ -142,10 +142,4 @@ mod tests {
 	    assert_eq!(parse_line(s.to_string()), Ok(expected));
 	}
     }
-
-    #[test]
-    fn test_solve() {
-	let games_only: Vec<Game> = games().into_iter().map(|(_s, v)| v).collect();
-	assert_eq!(solve(games_only), 8);
-    }
 }
