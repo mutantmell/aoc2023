@@ -1,7 +1,6 @@
+use std::cmp;
 use std::collections::HashMap;
 use std::str::FromStr;
-
-
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 enum Color {
@@ -68,13 +67,25 @@ fn is_possible(g: &Game) -> bool {
     )
 }
 
-fn solve(games: Vec<Game>) -> i64 {
-    games.into_iter().filter(is_possible).map(|g| g.ix).sum()
-}
-
 pub fn solve_2a(lines: Vec<String>) -> Result<String, &'static str> {
     let parsed: Result<Vec<Game>, &'static str> = lines.into_iter().map(|line| parse_line(line)).into_iter().collect();
-    parsed.map(|games| solve(games).to_string())
+    parsed.map(|games| games.into_iter().filter(is_possible).map(|g| g.ix).sum::<i64>().to_string())
+}
+
+pub fn solve_2b(lines: Vec<String>) -> Result<String, &'static str> {
+    let parsed: Result<Vec<Game>, &'static str> = lines
+	.into_iter()
+	.map(|line| parse_line(line))
+	.into_iter()
+	.collect();
+    parsed.map(|games| games.into_iter().map(|game| {
+	let (r,b,g) = game.plays.into_iter().fold((0,0,0), |acc, p| (
+	    cmp::max(acc.0, *p.get(&Color::Red).unwrap_or(&0)),
+	    cmp::max(acc.1, *p.get(&Color::Blue).unwrap_or(&0)),
+	    cmp::max(acc.2, *p.get(&Color::Green).unwrap_or(&0)),
+	));
+	r * b * g
+    }).sum::<i64>().to_string())
 }
 
 #[cfg(test)]

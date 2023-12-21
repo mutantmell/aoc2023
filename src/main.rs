@@ -36,7 +36,7 @@ fn main() {
 	(2, AoC {
 	    input: Box::new(PathBuf::from("./data/day2.txt")),
 	    a: day2::solve_2a,
-	    b: None,
+	    b: Some(day2::solve_2b),
 	})
     ].into();
 
