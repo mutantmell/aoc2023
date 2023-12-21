@@ -22,13 +22,12 @@ mod tests {
 
     #[test]
     fn parse_line_givens() {
-	let cases = vec![
+	for (s, expected) in vec![
 	    ("1abc2", (1,2)),
 	    ("pqr3stu8vwx", (3,8)),
 	    ("a1b2c3d4e5f", (1,5)),
 	    ("treb7uchet", (7,7)),
-	];
-	for (s, expected) in cases {
+	] {
 	    assert_eq!(parse_line(s.to_string()), Ok(expected));
 	}
     }
