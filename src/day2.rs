@@ -1,14 +1,7 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
 use std::str::FromStr;
 
-fn read_lines<A>(path: A) -> io::Result<io::Lines<io::BufReader<File>>>
-where A: AsRef<Path>, {
-    let file = File::open(path)?;
-    Ok(io::BufReader::new(file).lines())
-}
+
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 enum Color {
@@ -79,13 +72,9 @@ fn solve(games: Vec<Game>) -> i64 {
     games.into_iter().filter(is_possible).map(|g| g.ix).sum()
 }
 
-pub fn solve_2a() {
-    if let Ok(lines) = read_lines(Path::new("./data/day2.txt")) {
-	let parsed: Result<Vec<Game>, &'static str> = lines.map(|line| parse_line(line.unwrap())).into_iter().collect();
-	if let Ok(games) = parsed {
-	    println!("{}", solve(games));
-	}
-    }
+pub fn solve_2a(lines: Vec<String>) -> Result<String, &'static str> {
+    let parsed: Result<Vec<Game>, &'static str> = lines.into_iter().map(|line| parse_line(line)).into_iter().collect();
+    parsed.map(|games| solve(games).to_string())
 }
 
 #[cfg(test)]

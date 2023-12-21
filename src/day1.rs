@@ -1,13 +1,4 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-
-fn read_lines<A>(path: A) -> io::Result<io::Lines<io::BufReader<File>>>
-where A: AsRef<Path>, {
-    let file = File::open(path)?;
-    Ok(io::BufReader::new(file).lines())
-}
 
 fn parse_line_a(line: String) -> std::result::Result<(u32, u32), &'static str> {
     if let Some(left) = line.chars().find_map(|x| x.to_digit(10)) {
@@ -60,22 +51,20 @@ fn parse_line_b(line: String) -> std::result::Result<(u32, u32), &'static str> {
     }
 }
 
-fn solve_1(f: fn(String) -> std::result::Result<(u32, u32), &'static str>) {
-    if let Ok(lines) = read_lines(Path::new("./data/day1.txt")) {
-	let res: u32 = lines.map(|line| {
-	    let (l,r) = f(line.unwrap()).unwrap();
-	    l * 10 + r
-	}).sum();
-	println!("{}", res);
-    }
+fn solve_1(f: fn(String) -> std::result::Result<(u32, u32), &'static str>, lines: Vec<String>) -> Result<String, &'static str> {
+    Ok(lines.into_iter().map(|line| {
+	let (l,r) = f(line).unwrap();
+	l * 10 + r
+    }).sum::<u32>().to_string())
 }
 
-pub fn solve_1a() {
-    solve_1(parse_line_a);
+
+pub fn solve_1a(input: Vec<String>) -> Result<String, &'static str> {
+    solve_1(parse_line_a, input)
 }
 
-pub fn solve_1b() {
-    solve_1(parse_line_b);
+pub fn solve_1b(input: Vec<String>) -> Result<String, &'static str> {
+    solve_1(parse_line_b, input)
 }
 
 #[cfg(test)]
