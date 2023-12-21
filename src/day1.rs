@@ -16,6 +16,16 @@ fn parse_line(line: String) -> std::result::Result<(u32, u32), &'static str> {
     }
 }
 
+pub fn solve_1a() {
+    if let Ok(lines) = read_lines(Path::new("./data/day1.txt")) {
+	let res: u32 = lines.map(|line| {
+	    let (l,r) = parse_line(line.unwrap()).unwrap();
+	    l * 10 + r
+	}).sum();
+	println!("{}", res);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
