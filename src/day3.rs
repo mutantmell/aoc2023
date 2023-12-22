@@ -13,12 +13,12 @@ struct Number {
 #[derive(Debug, PartialEq, Eq)]
 struct Grid {
     numbers: Vec<Number>,
-    symbols: HashMap<Coord, Vec<char>> // Adjacency Map
+    symbols: HashMap<Coord, char> // Adjacency Map
 }
 
 fn parse_grid(grid: Vec<String>) -> Grid {
     let mut numbers: Vec<Number> = vec![];
-    let mut symbols: HashMap<Coord, Vec<char>> = HashMap::new();
+    let mut symbols: HashMap<Coord, char> = HashMap::new();
     for (x_ix, grid_line) in grid.into_iter().enumerate() {
 	let x = u32::try_from(x_ix).unwrap();
 	let x_i32 = i32::try_from(x).unwrap();
@@ -46,15 +46,7 @@ fn parse_grid(grid: Vec<String>) -> Grid {
 			num_ix = i32::MAX;
 		    };
 		    if c != '.' {
-			for x_del in [-1,0,1] {
-			    for y_del in [-1,0,1] {
-				let coord = (x_i32+x_del, y_i32+y_del);
-				if !symbols.contains_key(&coord) {
-				    symbols.insert(coord, vec![]);
-				};
-				symbols.get_mut(&coord).unwrap().push(c);
-			    };
-			};
+			symbols.insert((x_i32, y_i32), c);
 		    };
 		}
 	    }
@@ -76,10 +68,49 @@ fn parse_grid(grid: Vec<String>) -> Grid {
 pub fn solve_3a(input: Vec<String>) -> Result<String, &'static str> {
     let grid = parse_grid(input);
     let mut sum: i64 = 0;
+
+    let mut adjacencies = HashMap::new();
+    for c in grid.symbols.keys() {
+	for x_del in [-1,0,1] {
+	    for y_del in [-1,0,1] {
+		let coord = (c.0+x_del, c.1+y_del);
+		if !adjacencies.contains_key(&coord) {
+		    adjacencies.insert(coord, vec![]);
+		};
+		adjacencies.get_mut(&coord).unwrap().push(grid.symbols.get(c).unwrap());
+	    };
+	};
+    }
+    
     for n in grid.numbers {
-	println!("{:?}", n);
-	if (0..(n.len)).any(|x| grid.symbols.contains_key(&(n.start.0, n.start.1+x))) {
+	if (0..(n.len)).any(|x| adjacencies.contains_key(&(n.start.0, n.start.1+x))) {
 	    sum += n.label;
+	}
+    }
+    Ok(sum.to_string())
+}
+
+pub fn solve_3b(input: Vec<String>) -> Result<String, &'static str> {
+    let grid = parse_grid(input);
+    let mut adjacencies = HashMap::new();
+    for n in grid.numbers {
+	for x_del in [-1,0,1] {
+	    for y_del in (-1)..(n.len+1) {
+		let coord = (n.start.0+x_del, n.start.1+y_del);
+		if !adjacencies.contains_key(&coord) {
+		    adjacencies.insert(coord, vec![]);
+		};
+		adjacencies.get_mut(&coord).unwrap().push(n.label);
+	    };
+	};
+    }
+
+    let mut sum: i64 = 0;
+    for (c, &s) in &grid.symbols {
+	if s == '*' {
+	    if let Some(adjacent) = adjacencies.get(c).filter(|v| v.len() == 2) {
+		sum += adjacent.into_iter().product::<i64>()
+	    }
 	}
     }
     Ok(sum.to_string())
@@ -120,63 +151,12 @@ mod tests {
 		Number { label: 598, start: (9, 5), len: 3 },
 	    ],
 	    symbols: [
-		((0,2), vec!['*']),
-		((0,3), vec!['*']),
-		((0,4), vec!['*']),
-
-		((1,2), vec!['*']),
-		((1,3), vec!['*']),
-		((1,4), vec!['*']),
-
-		((2,2), vec!['*']),
-		((2,3), vec!['*']),
-		((2,4), vec!['*']),
-
-		((2,5), vec!['#']),
-		((2,6), vec!['#']),
-		((2,7), vec!['#']),
-
-		((3,2), vec!['*']),
-		((3,3), vec!['*']),
-		((3,4), vec!['*']),
-		((3,5), vec!['#']),
-		((3,6), vec!['#']),
-		((3,7), vec!['#']),
-
-		((4,2), vec!['*']),
-		((4,3), vec!['*']),
-		((4,4), vec!['*', '+']),
-		((4,5), vec!['#', '+']),
-		((4,6), vec!['#', '+']),
-		((4,7), vec!['#']),
-
-		((5,2), vec!['*']),
-		((5,3), vec!['*']),
-		((5,4), vec!['*', '+']),
-		((5,5), vec!['+']),
-		((5,6), vec!['+']),
-
-		((6,4), vec!['+']),
-		((6,5), vec!['+']),
-		((6,6), vec!['+']),
-
-		((7,2), vec!['$']),
-		((7,3), vec!['$']),
-		((7,4), vec!['$', '*']),
-		((7,5), vec!['*']),
-		((7,6), vec!['*']),
-
-		((8,2), vec!['$']),
-		((8,3), vec!['$']),
-		((8,4), vec!['$', '*']),
-		((8,5), vec!['*']),
-		((8,6), vec!['*']),
-
-		((9,2), vec!['$']),
-		((9,3), vec!['$']),
-		((9,4), vec!['$', '*']),
-		((9,5), vec!['*']),
-		((9,6), vec!['*']),
+		((1,3), '*'),
+		((3,6), '#'),
+		((4,3), '*'),
+		((5,5), '+'),
+		((8,3), '$'),
+		((8,5), '*'),
 	    ].into(),
 	});
     }
@@ -184,5 +164,10 @@ mod tests {
     #[test]
     fn solve_a_given() {
 	assert_eq!(solve_3a(grid()), Ok("4361".to_string()));
+    }
+
+    #[test]
+    fn solve_b_given() {
+	assert_eq!(solve_3b(grid()), Ok("467835".to_string()));
     }
 }
